@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="vi" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      // Ensure window.fetch has both a getter and setter so injected scripts/extensions can wrap fetch without throwing 'Cannot set property fetch of #<Window> which has only a getter'
+      (function() {
+        try {
+          var originalFetch = typeof window !== 'undefined' && window.fetch ? window.fetch.bind(window) : undefined;
+          var currentFetch = originalFetch;
+          
+          Object.defineProperty(window, 'fetch', {
+            configurable: true,
+            enumerable: true,
+            get: function() {
+              return currentFetch;
+            },
+            set: function(val) {
+              currentFetch = val;
+            }
+          });
+
+          if (typeof window !== 'undefined' && window.Window && window.Window.prototype) {
+            try {
+              var protoDesc = Object.getOwnPropertyDescriptor(window.Window.prototype, 'fetch');
+              if (protoDesc && !protoDesc.set && protoDesc.configurable) {
+                Object.defineProperty(window.Window.prototype, 'fetch', {
+                  configurable: true,
+                  enumerable: true,
+                  get: function() {
+                    return currentFetch;
+                  },
+                  set: function(val) {
+                    currentFetch = val;
+                  }
+                });
+              }
+            } catch (e) {}
+          }
+        } catch (e) {}
+
+        // Prevent extension errors from breaking application lifecycle
+        if (typeof window !== 'undefined') {
+          window.addEventListener('error', function(e) {
+            if (
+              (e && e.filename && e.filename.indexOf('chrome-extension://') !== -1) ||
+              (e && e.message && e.message.indexOf('Cannot set property fetch') !== -1)
+            ) {
+              if (e.preventDefault) e.preventDefault();
+              if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+              return true;
+            }
+          }, true);
+        }
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dã Hoa Khai Xứ - Trung Tâm Giáo Dục Về Môi Trường</title>
+    <meta name="description" content="Dự án giáo dục môi trường của nhóm bạn trẻ đến từ FPT" />
+    <meta property="og:title" content="Dã Hoa Khai Xứ - Trung Tâm Giáo Dục Về Môi Trường" />
+    <meta property="og:description" content="Dự án giáo dục môi trường của nhóm bạn trẻ đến từ FPT" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@200;300;400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  </head>
+  <body class="bg-[#F8FAF8] text-[#334D3D] antialiased selection:bg-[#72A285] selection:text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
